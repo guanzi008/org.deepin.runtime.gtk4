@@ -12,22 +12,37 @@ package:
 base: org.deepin.base/25.2.0
 
 build: |
+  rm -rf /etc/apt/sources.list.d/testing.sources
+  echo 'deb [arch=amd64 trusted=yes]  https://ci.deepin.com/repo/deepin/deepin-community/stable crimson/release main commercial community' > /etc/apt/sources.list.d/deepin.list || true
+  apt-get update || true
+  apt-get install -y git quilt  # °²×°git
+  mkdir -p /project/linglong/sources/webkit2gtk4
+  mv /project/linglong/sources/webkit2gtk /project/linglong/sources/webkit2gtk4/webkit2gtk 
+  cd /project/linglong/sources/webkit2gtk4/webkit2gtk
+  git fetch origin tag 2.48.0-1deepin1
+  git switch --detach 2.48.0-1deepin1 
+  export QUILT_PATCHES=debian/patches
+  quilt import /project/0001-fix-runtime-adapt-to-Linglong-runtime-path.patch || true
+  # quilt push -a || true
+  apt-get build-dep ./ -y
+  dpkg-buildpackage -uc -us -b 
+  cp -a ../libjavascriptcoregtk-4.1-0_2.48.0-1deepin1_amd64.deb /project/linglong/sources/ || true
+  cp -a ../libwebkit2gtk-4.1-0_2.48.0-1deepin1_amd64.deb /project/linglong/sources/ || true
+  cd /project
   bash ./build.bash
-
 sources:
-  - kind: file
-    url: https://github.com/LFRon/webkit2gtk-for-linyaps/releases/download/2.48.0-1/libjavascriptcoregtk-4.1-0_2.48.0-1_amd64.deb
-    digest: b819012853ab8f69f8e6218bce4c8b907c375467c0bf1f78f02de963cefb4042
-  - kind: file
-    url: https://github.com/LFRon/webkit2gtk-for-linyaps/releases/download/2.48.0-1/libwebkit2gtk-4.1-0_2.48.0-1_amd64.deb
-    digest: 6e0587cad04f8e235014fe69891682275d678297f5f6a7c1a1814612a71c64ed
+  - kind: git
+    url: https://github.com/deepin-community/webkit2gtk.git
+    commit: 2.48.0-1deepin1
+    version: 2.48.0-1deepin1
+    name: webkit2gtk
   # linglong:gen_deb_source sources amd64 https://ci.deepin.com/repo/deepin/deepin-community/stable crimson/release main commercial community
   # linglong:gen_deb_source install libgtk-4-1, libgtk-4-common, libwebkit2gtk-4.1-0, libadwaita-1-0, libgtk-4-media-gstreamer, libavif16, libgtk-3-0, libgtk-3-bin, libgtk-3-common
   # linglong:gen_deb_source exclude fonts-croscore, fonts-freefont-otf, fonts-freefont-ttf, fonts-liberation, fonts-texgyre
   # linglong:gen_deb_source exclude libwebkit2gtk-4.1-0, libjavascriptcoregtk-4.1-0
   - kind: file
-    url: https://ci.deepin.com/repo/deepin/deepin-community/stable/pool/community/x/xuxen-eu-spell/aspell-eu_3.0.20070215-1_all.deb
-    digest: f8c08277ed04cbe85eef2e3875196252a65e38e4178ae53000ece4a7340ab9c6
+    url: https://ci.deepin.com/repo/deepin/deepin-community/stable/pool/main/m/myspell-pt-br/aspell-pt-br_20131030-19_all.deb
+    digest: 464d881e5ca1054472dc2968be4f8e3b8768f069c13bef969dea8850251ce132
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/stable/pool/main/a/aspell/aspell_0.60.8-6_amd64.deb
     digest: d0a1cf2583ca5ed794671c4156ff6d03c7ceb7166c8d752f828f17ebdde4c7b6
@@ -47,8 +62,8 @@ sources:
     url: https://ci.deepin.com/repo/deepin/deepin-community/stable/pool/main/s/scowl/hunspell-en-us_2020.12.07-1_all.deb
     digest: 6a8253970b5399571a39d53de050d169ed3eae866aa656b0dea37531a68549de
   - kind: file
-    url: https://ci.deepin.com/repo/deepin/deepin-community/stable/pool/main/i/ispell/ibritish-large_3.4.02-2_all.deb
-    digest: b7d11baba9e29ff15fe4326110cb341344cbe2c1403de6783f4cd549813edf96
+    url: https://ci.deepin.com/repo/deepin/deepin-community/stable/pool/main/i/ispell/ibritish-huge_3.4.02-2_all.deb
+    digest: bda454b74a3e2f2180153c80a510b5939cca8e8cd367d8d395ada005b1df8fef
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/stable/pool/main/i/ispell/ienglish-common_3.4.02-2_all.deb
     digest: 7d9c9bbe2db42af0a15f7374cbd6e56d4b16341c86867b7c2f301d119658e1bc
@@ -221,8 +236,8 @@ sources:
     url: https://ci.deepin.com/repo/deepin/deepin-community/stable/pool/main/liby/libyuv/libyuv0_0.0.1888.20240710-3_amd64.deb
     digest: ee79d2e37a74fff74155751702fc35a4623f23093950fecb5cadb80dc23b9f6c
   - kind: file
-    url: https://ci.deepin.com/repo/deepin/deepin-community/stable/pool/main/i/ispell-czech/myspell-cs_20040229-9_all.deb
-    digest: 4f3458ea9346ee21ad3cf6383441bcee22d846422691b2a48cba76dfd5e23d3d
+    url: https://ci.deepin.com/repo/deepin/deepin-community/stable/pool/main/o/openoffice.org-en-au/myspell-en-au_2.1-7_all.deb
+    digest: 89b1de133559b843566e26e09844b4efb9e8bf4f09a6c141eadbba4c86fdfece
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/stable/pool/main/u/usrmerge/usrmerge_39+nmu2deepin1_all.deb
     digest: 544feca0992471720cd5648cf88b0241df5d32cf72c2037ab5d19fd617a15a29
