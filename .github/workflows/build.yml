@@ -1,19 +1,41 @@
-name: CI
+name: Linglong CI
+
 on:
   push:
-    branches: ["*"]
+    branches: [runtime-action]
   pull_request:
-    branches: ["*"]
+    branches: [runtime-action]
   workflow_dispatch:
+
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-24.04
+    timeout-minutes: 60
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout current repo
+        uses: actions/checkout@v4
         with:
-          repository: linuxdeepin/linglong-builder-demo
+          fetch-depth: 0
 
-      - name: ll-builder-build
+      - name: Build with ll-builder
         uses: guanzi008/linglong-builder-action@main
+
+      # 可选：上传构建产物，便于在 Actions 页面下载
+      - name: Upload build artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: linglong-build
+          path: |
+            linglong/**
+            *.layer
+            **/*.layer
